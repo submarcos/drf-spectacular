@@ -122,8 +122,8 @@ def map_geo_field(serializer, geo_field_name):
     if isinstance(field, GeometrySerializerMethodField):
         warn("Geometry generation for GeometrySerializerMethodField is not supported.")
         return {}
-    model_field = get_field_info(serializer.Meta.model).fields[geo_field_name]
-    return build_geo_schema(model_field)
+    model_field = get_field_info(serializer.Meta.model).fields.get(geo_field_name)
+    return build_geo_schema(model_field) if model_field else {}
 
 
 def _inject_enum_collision_fix(collection):
