@@ -3410,3 +3410,54 @@ def test_model_choice_display_method_on_readonly(no_warnings):
     assert schema['components']['schemas']['X']["properties"]["field_shirts"] == {
         "readOnly": True, 'type': 'string'
     }
+
+
+@mock.patch('drf_spectacular.settings.spectacular_settings.OPERATION_ID_METHOD_POSITION', "PRE")
+def test_operation_id_method_position(no_warnings):
+    class XViewSet(viewsets.ReadOnlyModelViewSet):
+        queryset = SimpleModel.objects.all()
+        serializer_class = SimpleSerializer
+
+    schema = generate_schema('/x', XViewSet)
+    assert schema['paths']['/x/']['get']["operationId"] == 'list_x'
+    assert schema['paths']['/x/{id}/']['get']["operationId"] == 'retrieve_x'
+
+
+class SelfReferentialSerializer(serializers.Serializer):
+    field_int = serializers.IntegerField()
+    field_self = serializers.SerializerMethodField()
+
+    def get_field_self(self) -> "SelfReferentialSerializer":
+        return SelfReferentialSerializer()  # pragma: no cover
+
+
+def test_self_referential_serializer_method_field(no_warnings):
+    class XViewset(viewsets.ModelViewSet):
+        serializer_class = SelfReferentialSerializer
+        queryset = SimpleModel.objects.all()
+
+    schema = generate_schema('/x', XViewset)
+    assert schema['components']['schemas']['SelfReferential']['properties'] == {
+        'field_int': {'type': 'integer'},
+        'field_self': {
+            'allOf': [{'$ref': '#/components/schemas/SelfReferential'}],
+            'readOnly': True
+        }
+    }
+
+
+def test_primary_key_related_field_with_custom_pk_field(no_warnings):
+    class XSerializer(serializers.Serializer):
+        field = serializers.PrimaryKeyRelatedField(
+            read_only=True,
+            pk_field=serializers.IntegerField(),
+        )
+
+    class XViewset(viewsets.ModelViewSet):
+        serializer_class = XSerializer
+        queryset = SimpleModel.objects.all()
+
+    schema = generate_schema('/x', XViewset)
+    assert schema['components']['schemas']['X']['properties']['field'] == {
+        'readOnly': True, 'type': 'integer'
+    }

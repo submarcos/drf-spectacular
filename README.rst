@@ -24,7 +24,7 @@ Features
         - ... and more customization options
     - Authentication support (DRF natives included, easily extendable)
     - Custom serializer class support (easily extendable)
-    - ``SerializerMethodField()`` type via type hinting or ``@extend_schema_field``
+    - `SerializerMethodField() <https://drf-spectacular.readthedocs.io/en/latest/customization.html#step-3-extend-schema-field-and-type-hints>`_ type via type hinting or ``@extend_schema_field``
     - i18n support
     - Tags extraction
     - Request/response/parameter examples
@@ -62,7 +62,7 @@ Requirements
 ------------
 
 -  Python >= 3.7
--  Django (2.2, 3.2, 4.0, 4.1, 4.2, 5.0)
+-  Django (2.2, 3.2, 4.0, 4.1, 4.2, 5.0, 5.1, 5.2)
 -  Django REST Framework (3.10.3, 3.11, 3.12, 3.13, 3.14, 3.15)
 
 Installation
